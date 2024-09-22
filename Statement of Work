@@ -1,0 +1,66 @@
+Project Title: Battleship Project
+
+Team:
+Mitchell Barrett
+
+Project Objective:
+Make a working and functional multiplayer Battleship game
+
+Scope:
+Inclusions:
+Over the Network Play
+Board to show ships, hits and misses
+Menu to start the game
+
+Exclusions:
+N/A
+
+Deliverables:
+Python Scripts
+Access to Code
+A really neat game
+
+Timeline:
+TCP Client 			- OCT 6
+Message Protocol 		- OCT 20
+Multiplayer functionality 	- NOV 3
+Game implementation 		- NOV 17
+Error Handling and Polishing 	- DEC 6
+
+
+Key Milestones:
+Base TCP Client and Messaging protocols 	- 2 weeks 
+Communication for Multiplayer functionality 	- 4 weeks
+Complete Game Code                         	- 7 weeks
+Error Handling 					- 8 weeks
+
+Task Breakdown:
+Creation of TCP Client code for communication and socket setup		- 2 hours
+Creation of Messaging Protocol for game communiction   			- 4 hours
+Board Setup								- 2 hours
+Actions for hit or miss							- 2 hours
+Rules for playing and winning						- 1 hour
+Menu for game start and network settings				- 3 hours
+Error Handling								- 1 hour
+Testing									- 4 hours
+
+
+Technical Requirements:
+Hardware:
+2 servers, 2 Network Interface Cards OR virtual machines
+
+Software:
+Python
+	- socket
+	- threading
+Visual Studio
+Windows or Linux
+
+Assumptions:
+	Assuming that the CS department servers will suffice for netowrk testing 
+Roles and Responsibilities:
+	Mitchell Barrett - Everything and All
+Communication Plan:
+	N/A
+Additional Notes:
+	N/A
