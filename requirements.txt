@@ -1,0 +1,5 @@
+REQUIREMENTS
+
+Linux Based Enviroment
+Network Interface Card
+Python3
