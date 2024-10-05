@@ -7,6 +7,7 @@ sel = selectors.DefaultSelector()
 def connObject():
     server_ip = input("Enter Server IP\n")
     server_port = input("Enter Server port\n")
+    server_port = int(server_port)
     try:
         addr = (server_ip, server_port)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

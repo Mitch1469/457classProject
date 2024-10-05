@@ -45,17 +45,18 @@ try:
                 if len(connections) == 2:
                     conn1, addr1 = connections.pop(0)
                     conn2, addr2 = connections.pop(0)
-                    connPair = ServerLib(conn1, addr1, conn2, addr2)
+                    connPair = ServerLib(conn1, addr1, conn2, addr2, logger)
                     sel.register(conn1, selectors.EVENT_READ | selectors.EVENT_WRITE, data=connPair)
                     sel.register(conn2, selectors.EVENT_READ | selectors.EVENT_WRITE, data=connPair)
+                    gamesetup.game_setup(connPair, sel)
             else:
                 connPair = a.data  
                 try:
-                    serverlib.game_setup(connPair, sel)
+                    connPair.exchange_data(sel)
                 except Exception as e:
                     logger.error(f"Error with connection {connPair}: {e}")
-                    serverlib.close(connPair.conn1, connPair.addr1, sel, logger)
-                    serverlib.close(connPair.conn2, connPair.addr2, sel, logger)
+                    connPair.close(sel)
+                    connPair.close(sel)
                 
 except KeyboardInterrupt:
     logger.info("Server shutting down")
