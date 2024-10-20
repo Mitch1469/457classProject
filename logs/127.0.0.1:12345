@@ -1,0 +1,8 @@
+2024-10-20 17:49:18,083 - INFO - Displaying menu options
+2024-10-20 17:49:22,676 - INFO - Connection established to 127.0.0.1:12345
+2024-10-20 17:49:22,677 - INFO - Received: {"msg_type": "request", "data": "Enter your username (Player 2):"}
+2024-10-20 17:49:25,748 - INFO - Sent: {'msg_type': 'join', 'data': 'B'}
+2024-10-20 17:49:25,748 - INFO - Received: {"msg_type": "message", "data": "Game starting! Player 1: B, Player 2: A"}
+2024-10-20 17:49:25,848 - INFO - Received: {"msg_type": "game_init", "data": "Place Your Pieces"}
+2024-10-20 17:49:28,393 - INFO - Received: {"msg_type": "chat", "data": "2024-10-20 17:49:33,009 - INFO - Sent: {'msg_type': 'command', 'data': 'current_games'}
+2024-10-20 17:49:33,010 - INFO - Received: {"msg_type": "message", "data": "There are 1 active game(s):\nGame between B and A"}

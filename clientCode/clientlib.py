@@ -1,19 +1,19 @@
 import logging
 import socket
 import selectors
+import json
 
 sel = selectors.DefaultSelector()
 
-def connObject():
-    server_ip = input("Enter Server IP\n")
-    server_port = input("Enter Server port\n")
-    server_port = int(server_port)
+def connObject(ip, port):
+    # server_ip = "127.0.0.1"
+    # server_port = 12345
     try:
-        addr = (server_ip, server_port)
+        addr = (ip, port)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setblocking(False)
         sock.connect_ex(addr)
-        logging.info(f"Connection established to {server_ip}:{server_port}")
+        logging.info(f"Connection established to {ip}:{port}")
         return sock
     except socket.error as e:
         logging.error(f"Connection issue: {e}")
@@ -21,20 +21,19 @@ def connObject():
 
 def menu():
     logging.info("Displaying menu options")
-    print("BATTLESHIPS\nPlay\nNetwork Configuration\nQuit\n")
-    selection = input("Make Selection\n")
-    if selection == "Play" or "Network Configuration" or "Quit":
-        s_conn = menu_handler(selection)
+    selection = input("BATTLESHIPS\nPress Enter to Start\n")
+    selection = "a"
+    if selection == "a":
+        ip = input("Enter Server IP\n")
+        port = input("Enter Server Port\n")
+        port = int(port)
+        s_conn = connObject(ip, port)
         return s_conn
 
-def menu_handler(selection):
-    if selection == "Play":
-        logging.info(f"Selected option: {selection}")
-        s_conn = connObject()
-        return s_conn
 
 def send_message(sock, message):
     try:
+        json_message = json.dumps(message)
         try:
             sel.get_key(sock)
             sel.modify(sock, selectors.EVENT_WRITE)
@@ -43,7 +42,7 @@ def send_message(sock, message):
         events = sel.select()
         for key, mask in events:
             if mask & selectors.EVENT_WRITE:
-                sock.sendall(message.encode('utf-8'))
+                sock.sendall(json_message.encode('utf-8'))
                 logging.info(f"Sent: {message}")
         sel.modify(sock, selectors.EVENT_READ)
 
@@ -64,12 +63,16 @@ def wait_for_message(sock):
             try:
                 data = sock.recv(1024)
                 if data:
+                    json_data = json.loads(data.decode('utf-8'))
                     logging.info(f"Received: {data.decode('utf-8')}")
-                    return data.decode('utf-8')
+                    return json_data
                 else:
                     logging.warning("Connection closed by server.")
                     return None
             except socket.error as e:
                 logging.error(f"Socket error: {e}")
+                return None
+            except json.JSONDecodeError as e:
+                logging.error(f"JSON decode error: {e}")
                 return None
     return None
