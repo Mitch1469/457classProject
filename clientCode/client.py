@@ -7,14 +7,16 @@ import selectors
 import threading
 import time
 import gameStatics
+from GameStateClient import GameStateClient
+
+gameState = None
 
 def message_listener(s_conn):
     while True:
         message = clientlib.wait_for_message(s_conn)
-        print(message)
-        
+        if message != None:
+            print(message)      
         if message:
-            print(message)
             try:
                 message_json = message
                 msg_type = message_json.get('msg_type')
@@ -29,8 +31,43 @@ def message_listener(s_conn):
                     os._exit(0)
                 if msg_type == "game_init":
                     new_board = gameStatics.create_empty_board()
-                    gameStatics.print_board(new_board)
-                    
+                    gameState = GameStateClient(new_board)
+                    gameState.place_pieces()
+                    clientlib.send_message(s_conn, {"msg_type": "game_init", "data": "set"})
+                
+                if msg_type == "gameplay":
+                    msg_data = message_json.get('data')
+                    json_mess = message_json.get('message')
+                    if msg_data == "turn":
+                        print(gameStatics.print_board(gameState.guess_board))
+                        while(True):
+                            print(json_mess + "\n")
+                            guess_column = int(input("Enter Column Guess\n"))
+                            guess_row = int(input("Enter Row Guess\n"))
+                            guess_check = gameStatics.guess_checker(gameState.guess_board, guess_column, guess_row)
+                            if guess_check:
+                                guess = str(guess_column) + "," + str(guess_row)
+                                clientlib.send_message(s_conn, {"msg_type": "gameplay", "data": guess})
+                                break                        
+                    if msg_data == "guess":
+                        guess_array = json_mess.split(",")
+                        guess_column = int(guess_array[0])
+                        guess_row = int(guess_array[1])
+                        gameState.board, message, gamestate = gameStatics.checker(gameState.board, guess_column, guess_row)
+                        if gamestate == True:
+                            clientlib.send_message(s_conn, {"msg_type": "gameplay", "data": message, "gamestate": "gameover"})
+                            break
+                        clientlib.send_message(s_conn, {"msg_type": "gameplay", "data": message})
+                    if msg_data == "answer":
+                        answer_unfiltered = message
+                        guess = answer_unfiltered.get('guess')
+                        guess_array = guess.split(",")
+                        guess_column = int(guess_array[0])
+                        guess_row = int(guess_array[1])
+                        answer = answer_unfiltered.get('message')
+                        print(answer)
+                        gameStatics.print_board(gameState.board)
+                        gameState.guess_board = gameStatics.add_to_guess_board(gameState.guess_board, guess_column, guess_row, answer)                   
                 else:
                     print(f"Server message: {message_json['data']}")
 
@@ -76,7 +113,10 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-s_conn = clientlib.menu()
+
+ip = sys.argv[1]
+port = int(sys.argv[2])
+s_conn = clientlib.connObject(ip, port)
 
 if s_conn:
     print("Waiting for Players")
@@ -84,7 +124,8 @@ if s_conn:
     if message:
         name = input(message['data']) 
         clientlib.send_message(s_conn, {"msg_type": "join", "data": name})
-    message_loop(s_conn)
+    #message_loop(s_conn)
+    message_listener(s_conn)
 
 else:
     print("Failed to connect to server.")

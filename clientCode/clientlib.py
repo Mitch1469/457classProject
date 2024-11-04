@@ -19,16 +19,7 @@ def connObject(ip, port):
         logging.error(f"Connection issue: {e}")
         return None
 
-def menu():
-    logging.info("Displaying menu options")
-    selection = input("BATTLESHIPS\nPress Enter to Start\n")
-    selection = "a"
-    if selection == "a":
-        ip = input("Enter Server IP\n")
-        port = input("Enter Server Port\n")
-        port = int(port)
-        s_conn = connObject(ip, port)
-        return s_conn
+
 
 
 def send_message(sock, message):

@@ -4,6 +4,7 @@ import selectors
 import serverlib
 import json
 import time
+from clientGameState import GameState
 
 class GameManager:
     def __init__(self):
@@ -47,13 +48,14 @@ class GameSetup:
         self.sel = sel
         self.game_manager = game_manager
         self.game_manager.add_game(self)
+        self.gamestate = None
 
     def start_game(self):
         self.logger.info("Starting game setup, asking for usernames.")
         self.request_username(self.conn1, "Enter your username (Player 1):")
         self.request_username(self.conn2, "Enter your username (Player 2):")
 
-        self.conn1_name, self.conn2_name = self.wait_for_both_usernames(self.sel)
+        self.conn1_name, self.conn2_name = self.wait_for_both(self.sel)
         self.logger.info(f"Player 1: {self.conn1_name}, Player 2: {self.conn2_name}")
         self.game_active = True
         json_message = json.dumps({"msg_type": "message", "data": f"Game starting! Player 1: {self.conn1_name}, Player 2: {self.conn2_name}"})
@@ -64,6 +66,12 @@ class GameSetup:
 
         json_startmessage = json.dumps({"msg_type": "game_init", "data": "Place Your Pieces"})
         self.broadcast(json_startmessage)
+
+        set1, set2 = self.wait_for_both(self.sel)
+
+        self.turn_loop()
+
+                
 
 
 
@@ -101,7 +109,24 @@ class GameSetup:
         self.conn2.sendall(message.encode('utf-8'))
         self.logger.info(f"Broadcasting " + " " + message)
 
- 
+    def game_over(self, message="The game has ended."):
+        self.logger.info("Closing game connections.")
+        quit_message = json.dumps({"msg_type": "gameover", "data": message})
+        def notify_and_close(conn, player):
+            try:
+                if conn:
+                    conn.sendall(quit_message.encode('utf-8'))
+            except Exception as e:
+                self.logger.error(f"Failed to send game-over message to {player}: {e}")
+            time.sleep(0.1)  
+            try:
+                conn.close()
+            except Exception as e:
+                self.logger.error(f"Failed to close connection for {player}: {e}")
+        notify_and_close(self.conn1, "Player 1")
+        notify_and_close(self.conn2, "Player 2")
+        self.game_active = False
+        self.game_manager.remove_game(self)
 
     def close_game(self):
         self.logger.info("Closing game connections.")
@@ -131,11 +156,11 @@ class GameSetup:
         self.game_active = False
         self.game_manager.remove_game(self)
 
-    def wait_for_both_usernames(self, sel):
-        conn1_name = None
-        conn2_name = None
+    def wait_for_both(self, sel):
+        conn1_data = None
+        conn2_data = None
 
-        while not (conn1_name and conn2_name):
+        while not (conn1_data and conn2_data):
             events = sel.select(timeout=None)
             for key, mask in events:
                 conn = key.fileobj
@@ -145,19 +170,27 @@ class GameSetup:
                         if data:
                             message = json.loads(data.decode('utf-8'))
                             if message.get('msg_type') == 'join':
-                                if conn == self.conn1 and not conn1_name:
-                                    conn1_name = message.get('data')
-                                    self.logger.info(f"Player 1 username: {conn1_name}")
-                                elif conn == self.conn2 and not conn2_name:
-                                    conn2_name = message.get('data')
-                                    self.logger.info(f"Player 2 username: {conn2_name}")
+                                if conn == self.conn1 and not conn1_data:
+                                    conn1_data = message.get('data')
+                                    self.logger.info(f"Player 1 username: {conn1_data}")
+                                elif conn == self.conn2 and not conn2_data:
+                                    conn2_data = message.get('data')
+                                    self.logger.info(f"Player 2 username: {conn2_data}")
+                            if message.get('msg_type') == 'game_init':
+                                if conn == self.conn1 and not conn1_data:
+                                    conn1_data = message.get('data')
+                                    self.logger.info(f"Player 1 set: {conn1_data}")
+                                elif conn == self.conn2 and not conn2_data:
+                                    conn2_data = message.get('data')
+                                    self.logger.info(f"Player 2 set: {conn2_data}")
                     except json.JSONDecodeError as e:
                         self.logger.error(f"Error decoding message: {e}")
                     except ConnectionResetError as e:
                         self.logger.error(f"Connection reset by client: {e}")
                         self.close_game()
 
-        return conn1_name, conn2_name
+        return conn1_data, conn2_data
+    
 
     def exchange_data(self):
         while self.game_active:
@@ -174,3 +207,45 @@ class GameSetup:
                     except Exception as e:
                         self.logger.error(f"Error in data exchange: {e}")
                         self.close_game()
+
+    def wait_for_response(self, conn):
+        while True:
+            events = self.sel.select(timeout=None)  
+            for key, mask in events:
+                if key.fileobj == conn and mask & selectors.EVENT_READ:
+                    try:
+                        data = conn.recv(1024) 
+                        if data:
+                            message = data.decode('utf-8')
+                            print(message)
+                            return message  
+                    except Exception as e:
+                        self.logger.error(f"Error receiving response: {e}")
+                        return None
+                    
+    
+    def turn_loop(self):
+        turn, p_turn = self.conn1, self.conn1_name  
+        not_turn, p_not_turn = self.conn2, self.conn2_name
+        while True:
+            self.logger.info(f"{turn}'s turn")
+            move_message = json.dumps({"msg_type": "gameplay", "message": "Make your Move!", "data": "turn"})
+            turn.sendall(move_message.encode('utf-8'))
+            guess_unfiltered = self.wait_for_response(turn)
+            guess_unfiltered = json.loads(guess_unfiltered)
+            guess = guess_unfiltered.get('data')
+            not_turn.sendall(json.dumps({"msg_type": "gameplay", "message": guess, "data": "guess"}).encode('utf-8'))
+            answer_unfiltered = self.wait_for_response(not_turn)
+            answer_unfiltered = json.loads(answer_unfiltered)
+            message_answer = answer_unfiltered.get('data')
+            if "gamestate" in message_answer:
+                over = p_not_turn + " has lost all of there ships! " + p_turn + " has won!"
+                game_over = ({"msg_type": "gameover", "data": over })
+                self.broadcast(game_over)
+                self.game_over()
+            answer = answer_unfiltered.get('data')
+            turn.sendall(json.dumps({"msg_type": "gameplay", "message": answer, "data": "answer", "guess": guess}).encode('utf-8'))
+            turn, not_turn = not_turn, turn
+            p_turn, p_not_turn = p_not_turn, p_turn
+
+                                    
