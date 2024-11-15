@@ -13,8 +13,8 @@ This is a simple Battleship game implemented using Python and sockets.
 
 
 **How to play:**
-1. **Start the server:** Run the `server.py` with the ip and port wanted for the server script.
-2. **Connect clients:**  Run the `client.py` script on two different machines or terminals with the ip and port of the       server
+1. **Start the server:** Run the `server.py` with the port wanted for the server script. e.x python3 server.py -p 12345
+2. **Connect clients:**  Run the `client.py` script on two different machines or terminals with the ip and port of the server e.x. python3 client.py -i helena -p 12345
 3. **Play the game:** Players take turns entering their moves, after setting their pieces. 
 
 **Technologies used:**
