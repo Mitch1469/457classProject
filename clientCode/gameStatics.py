@@ -1,3 +1,5 @@
+import clientlib
+import sys
 ships = {
     "carrier": 5,
     "battleship": 4,
@@ -44,18 +46,18 @@ def placement(board, column, row, length, direction, piece_name):
     return board
 
 def guess_checker(board_guess, guess_column, guess_row):
-    s_check = board_guess[guess_row][guess_column]
     if guess_column < 0 or guess_column > 9 or guess_row < 0 or guess_row > 9:
         print("Guess outside board range\n")
         return False
+    
+    s_check = board_guess[guess_row][guess_column]
     if(s_check != "~"):
         print("Coordinates Already Guessed")
         return False
     return True
 def is_ship_sunk(board, symbol):
-    """Check if all parts of a specific ship (given by symbol) are hit (i.e., no cells with the ship's symbol remain)."""
     for row in board:
-        if symbol in row:  # If any part of the ship still exists, it's not sunk
+        if symbol in row:  
             return False
     return True
 
@@ -109,3 +111,23 @@ def add_to_guess_board(board_guess, guess_column, guess_row, answer):
         mark = "O"
     board_guess[guess_row][guess_column] = mark
     return board_guess    
+
+def show_menu(s_conn):
+    print("\n--- Game Menu ---")
+    print("1. Show Current Games")
+    print("2. Check Partner Connection")
+    print("3. Quit Game")
+    print("------------------")
+
+    choice = input("Select an option (1-3):\n")
+    if choice == "1":
+        clientlib.send_message(s_conn, {"msg_type": "command", "data": "current_games"})
+    elif choice == "2":
+        clientlib.send_message(s_conn, {"msg_type": "command", "data": "partner_connections"})
+    elif choice == "3":
+        clientlib.send_message(s_conn, {"msg_type": "command", "data": "quit"})
+        print("Quitting game...")
+        clientlib.close_socket(s_conn)
+        sys.exit(0)
+    else:
+        print("Invalid option. Returning to game.")

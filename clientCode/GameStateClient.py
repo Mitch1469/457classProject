@@ -1,6 +1,7 @@
 import gameStatics
 
 
+
 class GameStateClient:
     def __init__(self, board):
         self.board = board
@@ -73,4 +74,5 @@ class GameStateClient:
             if gameStatics.validity_checker(self.board, destColumn, destRow, destDirection, 2) == True:
                 self.board = gameStatics.placement(self.board, destColumn, destRow, 2, destDirection, "Dest")
                 break
-            
+
+    

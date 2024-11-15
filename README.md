@@ -1,15 +1,16 @@
 # Battleship Game
 
-This is a simple Tic-Tac-Toe game implemented using Python and sockets.
+This is a simple Battleship game implemented using Python and sockets.
 
 **Updates**
-Game functionality included. Initial board generation, placing of pieces, guess board showing previous hits misses, code for exchanging guess and identification of players ships and what has been hit.
+* Game now accepts inputs of -i and -p from the command line for ports and ips. Hostname also works in place of ip
 
-Turn loop included for the server that allows for players to take turns and exchange information
+* Game now properly ends when one player has one. Server sends a gameover message to the clients that allow for a graceful shutdown
 
-Conditions set for premature ending of game, and for when a game finishes
+* Code runs properly after completely removing refrences to clientGameState
 
-Chat function has been disabled due to issues with game implementation. 
+* Menu functions added, however do not work properly
+
 
 **How to play:**
 1. **Start the server:** Run the `server.py` with the ip and port wanted for the server script.
@@ -24,17 +25,19 @@ Chat function has been disabled due to issues with game implementation.
 **Message Protocols**
 * chat
   Used to pass non-game or server option messages between clients 
-* command
+* command(WORK IN PROGRESS)
   * quit
     Quits the game, closes connections, sends other player message telling the game has ended and removes game from acti    ve games
   * current_games 
     Lists number of active games and the player names of each game
   * partner_connections
     Lists socket information of both clients in the asking clients game
-  * gameplay
+* gameplay
     will tell the server of the update board, guess for ship location and other game specific information
-  * game_init 
+* game_init 
     The servers sends a game_init message to tell the clients to start a new board and have the players set there pieces  
+* game_over
+    The losing client sends a game_over message to the server, which relays this to the winning client
 
 **Files Included**
 * server.py       -- Acts the middle man between two clients. Takes requests and processes the game.

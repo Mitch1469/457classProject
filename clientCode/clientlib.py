@@ -2,21 +2,48 @@ import logging
 import socket
 import selectors
 import json
+import sys
+import ipaddress
 
 sel = selectors.DefaultSelector()
+
+def close_socket(sock):
+    if sock:
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except (socket.error, OSError):
+            pass  
+        finally:
+            sock.close()
+            print("Game is Closing!")
+            sys.exit()
+
+def is_ip_address(value):
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False
 
 def connObject(ip, port):
     # server_ip = "127.0.0.1"
     # server_port = 12345
     try:
+        if is_ip_address(ip) == False:
+            ip = socket.gethostbyname(ip)
         addr = (ip, port)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setblocking(False)
-        sock.connect_ex(addr)
-        logging.info(f"Connection established to {ip}:{port}")
-        return sock
+        result = sock.connect_ex(addr)
+        if result == 115:
+            logging.info(f"Connection established to {ip}:{port}")
+            return sock
+        else:
+            logging.error(f"Connection issue")
+            print("Connection Issue")
+            sock.close()
+            sys.exit()
     except socket.error as e:
-        logging.error(f"Connection issue: {e}")
         return None
 
 
@@ -67,3 +94,5 @@ def wait_for_message(sock):
                 logging.error(f"JSON decode error: {e}")
                 return None
     return None
+    
+
