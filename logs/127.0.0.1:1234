@@ -1,9 +1,0 @@
-2024-10-05 16:22:18,039 - INFO - Displaying menu options
-2024-10-05 16:22:20,080 - INFO - Selected option: Play
-2024-10-05 16:22:25,869 - INFO - Connection established to 127.0.0.1:1234
-2024-10-05 16:22:25,869 - INFO - Received: Enter a Username
-
-2024-10-05 16:22:29,754 - INFO - Sent: M
-2024-10-05 16:22:29,754 - INFO - Received: Player 1 username: M
-Player 2 username: P
-
