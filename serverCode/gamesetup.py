@@ -4,7 +4,7 @@ import selectors
 import serverlib
 import json
 import time
-from clientGameState import GameState
+import threading
 
 class GameManager:
     def __init__(self):
@@ -109,24 +109,41 @@ class GameSetup:
         self.conn2.sendall(message.encode('utf-8'))
         self.logger.info(f"Broadcasting " + " " + message)
 
-    def game_over(self, message="The game has ended."):
-        self.logger.info("Closing game connections.")
+    def game_over(self, message):
+        self.logger.info(f"Game Over: {message}")
         quit_message = json.dumps({"msg_type": "gameover", "data": message})
+        self.game_active = False  
+
         def notify_and_close(conn, player):
-            try:
-                if conn:
+            if conn:
+                try:
                     conn.sendall(quit_message.encode('utf-8'))
-            except Exception as e:
-                self.logger.error(f"Failed to send game-over message to {player}: {e}")
-            time.sleep(0.1)  
-            try:
-                conn.close()
-            except Exception as e:
-                self.logger.error(f"Failed to close connection for {player}: {e}")
-        notify_and_close(self.conn1, "Player 1")
-        notify_and_close(self.conn2, "Player 2")
+                    self.logger.info(f"Sent game-over message to {player}")
+                except Exception as e:
+                    self.logger.error(f"Failed to send game-over message to {player}: {e}")
+                finally:
+                    try:
+                        conn.shutdown(socket.SHUT_RDWR) 
+                        conn.close()
+                        self.logger.info(f"Closed connection for {player}")
+                    except Exception as e:
+                        self.logger.error(f"Failed to close connection for {player}: {e}")
+
+
+        threads = []
+        threads.append(threading.Thread(target=notify_and_close, args=(self.conn1, "Player 1")))
+        threads.append(threading.Thread(target=notify_and_close, args=(self.conn2, "Player 2")))
+
+        for thread in threads:
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
         self.game_active = False
         self.game_manager.remove_game(self)
+        self.logger.info("Game connections closed and game removed from manager.")
+
 
     def close_game(self):
         self.logger.info("Closing game connections.")
@@ -237,12 +254,10 @@ class GameSetup:
             not_turn.sendall(json.dumps({"msg_type": "gameplay", "message": guess, "data": "guess"}).encode('utf-8'))
             answer_unfiltered = self.wait_for_response(not_turn)
             answer_unfiltered = json.loads(answer_unfiltered)
-            message_answer = answer_unfiltered.get('data')
-            if "gamestate" in message_answer:
-                over = p_not_turn + " has lost all of there ships! " + p_turn + " has won!"
-                game_over = ({"msg_type": "gameover", "data": over })
-                self.broadcast(game_over)
-                self.game_over()
+            if answer_unfiltered.get('gamestate'):
+                over = f"{p_not_turn} has lost all their ships! {p_turn} has won!"
+                self.game_over(over)
+                break
             answer = answer_unfiltered.get('data')
             turn.sendall(json.dumps({"msg_type": "gameplay", "message": answer, "data": "answer", "guess": guess}).encode('utf-8'))
             turn, not_turn = not_turn, turn

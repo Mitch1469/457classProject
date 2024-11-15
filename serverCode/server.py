@@ -3,13 +3,17 @@ import os
 import logging
 import selectors
 import serverlib
+import argparse
 from gamesetup import GameManager
 from serverlib import ServerLib
 from gamesetup import GameSetup
 
 def main():
-    ip = sys.argv[1]
-    port = int(sys.argv[2])
+    ip = "0.0.0.0"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--port", type=int, required=True)
+    args = parser.parse_args()
+    port = args.port
     log_path = os.path.expanduser("~/457/ClassProject/457classProject/logs/server.log")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
