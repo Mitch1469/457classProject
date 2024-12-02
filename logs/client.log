@@ -1,0 +1,4 @@
+2024-11-30 17:39:36,197 - INFO - Connection established to 129.82.44.147:12345
+2024-11-30 17:39:36,198 - INFO - Received: {"msg_type": "request", "data": "Enter your username (Player 2):"}
+2024-11-30 17:39:40,007 - INFO - Sent: {'msg_type': 'join', 'data': 'B'}
+2024-11-30 17:39:40,008 - INFO - Received: {"msg_type": "game_init", "data": "Place Your Pieces", "players": {"player1": "B", "player2": "A"}}
