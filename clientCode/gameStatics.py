@@ -2,11 +2,11 @@
 
 # Ship names and lengths for access in placement and verification
 ships = {
-    "Carrier": 1,
-    "Battleship": 1,
-    "cruiser": 1,
-    "Submarine": 1,
-    "Destroyer": 1
+    "Carrier": 5,
+    "Battleship": 4,
+    "cruiser": 3,
+    "Submarine": 3,
+    "Destroyer": 2
 }
 
 # Creates a empty board object
