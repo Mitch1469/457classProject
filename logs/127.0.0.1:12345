@@ -1,1 +1,5 @@
-2024-12-02 09:40:28,836 - INFO - Connection established to 129.82.44.147:12345
+2024-12-02 10:50:06,511 - INFO - Connection established to 129.82.44.147:12345
+2024-12-02 10:50:06,511 - INFO - Received: {"msg_type": "request", "data": "Enter your username (Player 2):"}
+2024-12-02 10:50:08,191 - INFO - Ctrl+C detected. Performing global cleanup...
+2024-12-02 10:50:08,192 - INFO - Sent: {'msg_type': 'command', 'data': 'quit'}
+2024-12-02 10:50:08,192 - INFO - Connection to server Closed

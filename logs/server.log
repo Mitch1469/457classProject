@@ -1,1 +1,17 @@
-2024-12-02 09:40:28,837 - INFO - Client connected from ('129.82.44.147', 54000)
+2024-12-02 10:15:36,202 - INFO - Client connected from ('129.82.44.147', 58652)
+2024-12-02 10:15:38,231 - INFO - Client connected from ('129.82.44.147', 58656)
+2024-12-02 10:15:38,231 - INFO - Starting game setup. Requesting usernames from players.
+2024-12-02 10:15:39,308 - INFO - Player 2 username: None
+2024-12-02 10:15:41,095 - INFO - Player 1 username: None
+2024-12-02 10:15:41,095 - INFO - Both players joined: None, None
+2024-12-02 10:35:40,033 - INFO - Client connected from ('129.82.44.147', 47122)
+2024-12-02 10:50:04,294 - INFO - Player ('129.82.44.147', 58652) quit. Closing game.
+2024-12-02 10:50:04,294 - INFO - Game Over: Your opponent has left the game.
+2024-12-02 10:50:04,294 - INFO - Game-over message sent to Player 1
+2024-12-02 10:50:04,294 - INFO - Connection closed for Player 1
+2024-12-02 10:50:04,294 - INFO - Game-over message sent to Player 2
+2024-12-02 10:50:04,294 - INFO - Connection closed for Player 2
+2024-12-02 10:50:04,294 - INFO - Game state cleaned up.
+2024-12-02 10:50:06,511 - INFO - Client connected from ('129.82.44.147', 57072)
+2024-12-02 10:50:06,511 - INFO - Starting game setup. Requesting usernames from players.
+2024-12-02 10:50:06,511 - ERROR - Unexpected error: [Errno 107] Transport endpoint is not connected
