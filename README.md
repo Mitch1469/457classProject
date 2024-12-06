@@ -72,12 +72,12 @@ The server queue for waiting games was imrpoved as well. Moving from an array to
 
 **Retrospect**
 
-  *What Went Well*
+  *What Went Well
     * I learned alot about python. Much more than i had previously learned
     
     * The code and game works, the game is playable and errors are mostly handled
   
-  *What could Improve*
+  *What could Improve
     * The logging function is not used as much it should be
     
     * Not every forseeable error is handled appropriately
