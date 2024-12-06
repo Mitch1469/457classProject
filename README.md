@@ -74,16 +74,21 @@ The server queue for waiting games was imrpoved as well. Moving from an array to
 
   *What Went Well*
     * I learned alot about python. Much more than i had previously learned
+    
     * The code and game works, the game is playable and errors are mostly handled
   
   *What could Improve*
     * The logging function is not used as much it should be
+    
     * Not every forseeable error is handled appropriately
+    
     * I had to remove the chat feature due to issues with std_in and std_out while the main loop was running
+    
     * The base structure of the code was implemented when I didnt have a good understanding of how python worked, this created oddities such as internal signaling for ending a loop and even the need for threads on the client
 
 
 **Security Issues**
+
   If this was a banking app I would go to jail. There is no encrption or protection against Man in the Middle/Spoofing. Because the games are threaded on the server, it would be very possible to overload the server with games. So, there is no DOS prevention. The client uses global variables and internal signaling, which is unstable. 
 
   Encryption isnt compeletly neccessary due to the lack of PII and sensitive information, but it is the standard
