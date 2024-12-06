@@ -46,7 +46,6 @@ This is a simple Battleship game implemented using Python and sockets to allow f
 
 * clientGameState -- ** REMOVED ** placing, validation and guessing placed in client code
 
-
 * gameStatics     -- Contains statics such as game rules and piece information and the checking for valid placements and moves
 
 * GameStateClient -- Contains the code for setting peices on the board for the clients and tracking variables used accross the client program
@@ -73,11 +72,13 @@ The server queue for waiting games was imrpoved as well. Moving from an array to
 **Retrospect**
 
   *What Went Well
+  
     * I learned alot about python. Much more than i had previously learned
     
     * The code and game works, the game is playable and errors are mostly handled
   
   *What could Improve
+  
     * The logging function is not used as much it should be
     
     * Not every forseeable error is handled appropriately
